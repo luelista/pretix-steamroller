@@ -9,14 +9,15 @@ import collections.abc
 
 from requests import HTTPError, RequestException
 
+ref_root = None
+
 class ScalarRef:
     def __init__(self, v=None, ref=None):
         self.v = v
         self.ref = ref
 
     def deref(self):
-        print("deref",self.ref)
-        return _lookup_child(self.ref[0], self.ref[1].split('.'))
+        return _lookup_child(ref_root, self.ref)
 
     def __repr__(self):
         return "SR:"+str(self.v)
@@ -74,7 +75,6 @@ class APILink:
     def fetch_all(self):
         results = []
         response = requests.get(self.__str__(), headers=self.headers).json()
-        print(response)
         results.extend(response['results'])
         while response.get('next'):
             response = requests.get(response['next'], headers=self.headers).json()
@@ -112,7 +112,6 @@ def _force_type(o, idx, type, constructor):
 
 
 def _deep_update(d, u):
-    print("D-U",d,u)
     for k, v in u.items() if isinstance(u, collections.abc.Mapping) else (enumerate(u)):
         if isinstance(v, collections.abc.Mapping):
             d[k] = _deep_update(_force_type(d, k, collections.abc.Mapping, dict), v)
@@ -128,7 +127,7 @@ def _deep_update(d, u):
 def _flatten(x):
     return [el for y in x for el in y]
 
-def _lookup_children(obj, path, assign_refs=False, ignore_key_errors=False):
+def _lookup_children(obj, path, assign_refs=False, ignore_key_errors=False, with_path=None):
     if path[0] != '*':
         try:
             child = obj[path[0]]
@@ -139,16 +138,16 @@ def _lookup_children(obj, path, assign_refs=False, ignore_key_errors=False):
                 raise
         if len(path) == 1:
             if assign_refs and not isinstance(child, ScalarRef): child = obj[path[0]] = ScalarRef(child)
-            return [child]
+            return [(with_path + [path[0]], child)] if with_path is not None else [child]
         else:
-            return _lookup_children(child, path[1:], assign_refs, ignore_key_errors)
+            return _lookup_children(child, path[1:], assign_refs, ignore_key_errors, with_path + [path[0]] if with_path is not None else None)
     else:
         if len(path) == 1:
             if assign_refs:
                 for i, el in enumerate(obj):
                     if not isinstance(el, ScalarRef): obj[i] = ScalarRef(el)
-            return obj
-        return _flatten([_lookup_children(x, path[1:], assign_refs, ignore_key_errors) for x in obj])
+            return [(with_path + [i], child) for i, child in enumerate(obj)] if with_path is not None else obj
+        return _flatten([_lookup_children(x, path[1:], assign_refs, ignore_key_errors, with_path + [i] if with_path is not None else None) for i, x in enumerate(obj)])
 
 def _lookup_child(obj, path):
     if len(path) < 2:
@@ -159,14 +158,12 @@ def _fixup_refs(obj, where, to_where, to_what):
     where = where.split('.')[1:]
     to_where = to_where.split('.')[1:]
     to_what = to_what.split('.')[1:]
-    to_objs = _lookup_children(obj, to_where)
-
+    to_objs = _lookup_children(obj, to_where, with_path=[])
     from_obj = _lookup_children(obj, where, assign_refs=True)
-    print(from_obj)
     for from_id in from_obj:
         try:
-            ref = next(y for y in to_objs if _lookup_child(y, to_what) == from_id)
-            from_id.ref = [ref, ".".join(to_what)]
+            path, ref = next((path, y) for (path, y) in to_objs if _lookup_child(y, to_what) == from_id)
+            from_id.ref = path + to_what
         except StopIteration:
             pass
 
@@ -248,9 +245,11 @@ def fetch_event(base, organizer, event, file=None, keep_defaults=False):
 @click.argument('organizer')
 @click.argument('event')
 def create_event(base, organizer, event, force=False, file=None):
+    global ref_root
     apiref = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events' / ('event', event)
     create_apiref = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events'
     event_info = _read_yaml(file or ('_'.join(apiref.fpath) + '.yml'))
+    ref_root = event_info
     print(event_info)
 
     if force:
@@ -267,16 +266,22 @@ def create_event(base, organizer, event, force=False, file=None):
     for item_meta_property in event_info['item_meta_properties']:
         _deep_update(item_meta_property, (apiref / 'item_meta_properties').post(item_meta_property))
     for cat in event_info['categories']:
-        _deep_update(cat, (apiref / 'categories').post(cat))
+        cat['id'] = (apiref / 'categories').post(_without_keys(cat, {"cross_selling_match_products"}))['id']
     for item in event_info['items']:
         _deep_update(item, (apiref / 'items').post(item))
     for quota in event_info['quotas']:
         _deep_update(quota, (apiref / 'quotas').post(quota))
     for voucher in event_info['vouchers']:
         _deep_update(voucher, (apiref / 'vouchers').post(voucher))
-
     for question in event_info['questions']:
         question['id'] = (apiref / 'questions').post(_without_keys(question, {"dependency_question", "dependency_value"}))['id']
+
+    # fix circular dependencies
+
+    for category in event_info['categories']:
+        if category.get("cross_selling_match_products"):
+            (apiref / 'categories' / ('category', category['id'])).patch({"cross_selling_match_products": category["cross_selling_match_products"]})
+
     for question in event_info['questions']:
         if question.get("dependency_question"):
             _deep_update(question, (apiref / 'questions' / ('question', question['id'])).patch({"dependency_question": question["dependency_question"]}))
