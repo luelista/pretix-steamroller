@@ -22,6 +22,8 @@
   - web
   - pretixpos
   - resellers
+
+
 ".settings":
   imprint_url: null
   checkout_email_helptext:
@@ -715,6 +717,8 @@
   reusable_media_type_nfc_mf0aes_autocreate_giftcard_currency: EUR
   reusable_media_type_nfc_mf0aes_random_uid: false
   pretixpos_additional_receipt_text: null
+
+
 ".quotas.*":
   size: null
   variations: []
@@ -722,6 +726,8 @@
   closed: false
   close_when_sold_out: false
   release_after_exit: false
+
+
 ".items.*":
   category: null
   internal_name: null
@@ -780,6 +786,7 @@
   validity_dynamic_start_choice_day_limit: null
   media_policy: null
   media_type: null
+
 ".items.*.variations.*":
   active: true
   description: null
@@ -803,3 +810,51 @@
   - resellers
   hide_without_voucher: false
   meta_data: {}
+
+
+".item_meta_properties.*":
+  default: ''
+  required: false
+
+
+".vouchers.*":
+  max_usages: 1
+  redeemed: 0
+  min_usages: 1
+  valid_until: null
+  block_quota: false
+  allow_ignore_quota: false
+  price_mode: none
+  value: null
+  item: null
+  variation: null
+  quota: null
+  tag: ''
+  comment: ''
+  subevent: null
+  show_hidden_items: true
+  seat: null
+  all_addons_included: false
+  all_bundles_included: false
+
+
+".questions.*":
+  required: false
+  options: []
+  ask_during_checkin: false
+  show_during_checkin: false
+  dependency_question: null
+  dependency_values: []
+  hidden: false
+  dependency_value: null
+  print_on_invoice: false
+  help_text: null
+  valid_number_min: null
+  valid_number_max: null
+  valid_date_min: null
+  valid_date_max: null
+  valid_datetime_min: null
+  valid_datetime_max: null
+  valid_string_length_max: null
+  valid_file_portrait: false
+

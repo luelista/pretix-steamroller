@@ -9,8 +9,6 @@ import collections.abc
 
 from requests import HTTPError, RequestException
 
-auth_headers = json.loads(os.environ.get('AUTH_HEADERS', '{}'))
-
 class ScalarRef:
     def __init__(self, v=None, ref=None):
         self.v = v
@@ -45,7 +43,7 @@ class APILink:
             else:
                 api_base = "https://" + api_base
         self.api_base = api_base
-        self.headers = headers
+        self._headers = headers
         self.path = path
         self.vars = vars
 
@@ -56,6 +54,10 @@ class APILink:
     def fpath(self):
         return (el.format(**self.vars) for el in self.path)
 
+    @property
+    def headers(self):
+        return self._headers[self.api_base]
+
     def __truediv__(self, other):
         vars = self.vars
         if isinstance(other, str):
@@ -64,7 +66,7 @@ class APILink:
             varname, varvalue = other
             vars = dict(**vars, **{varname: varvalue})
             other = ['{' + varname + '}']
-        return APILink(self.api_base, self.headers, self.path + other, vars)
+        return APILink(self.api_base, self._headers, self.path + other, vars)
 
     def fetch_single(self):
         return requests.get(self.__str__(), headers=self.headers).json()
@@ -168,6 +170,9 @@ def _fixup_refs(obj, where, to_where, to_what):
         except StopIteration:
             pass
 
+def _without_keys(d, keys):
+    return {x: d[x] for x in d if x not in keys}
+
 def _is_dict_subset(subset, superset):
     if not isinstance(subset, dict) or not isinstance(superset, dict):
         return False
@@ -199,6 +204,11 @@ def _fetch_event(apiref):
     _fixup_refs(result, '.items.*.addons.*.addon_category', '.categories.*', '.id')
     _fixup_refs(result, '.quotas.*.items.*', '.items.*', '.id')
     _fixup_refs(result, '.quotas.*.variations.*', '.items.*.variations.*', '.id')
+    _fixup_refs(result, '.vouchers.*.item', '.items.*', '.id')
+    _fixup_refs(result, '.vouchers.*.variation', '.items.*.variations.*', '.id')
+    _fixup_refs(result, '.questions.*.items.*', '.items.*', '.id')
+    _fixup_refs(result, '.questions.*.dependency_question', '.questions.*', '.id')
+
     if result['event']['has_subevents']:
         result['subevents'] = (apiref / 'subevents').fetch_all()
     return result
@@ -253,13 +263,25 @@ def create_event(base, organizer, event, force=False, file=None):
     print(create_apiref.post({**event_info['event'], 'live': False}))
 
     (apiref / 'settings').patch(event_info['settings'])
+    for item_meta_property in event_info['item_meta_properties']:
+        _deep_update(item_meta_property, (apiref / 'item_meta_properties').post(item_meta_property))
     for cat in event_info['categories']:
         _deep_update(cat, (apiref / 'categories').post(cat))
     for item in event_info['items']:
         _deep_update(item, (apiref / 'items').post(item))
     for quota in event_info['quotas']:
         _deep_update(quota, (apiref / 'quotas').post(quota))
+    for voucher in event_info['vouchers']:
+        _deep_update(voucher, (apiref / 'vouchers').post(voucher))
 
+    for question in event_info['questions']:
+        question['id'] = (apiref / 'questions').post(_without_keys(question, {"dependency_question", "dependency_value"}))['id']
+    for question in event_info['questions']:
+        if question.get("dependency_question"):
+            _deep_update(question, (apiref / 'questions' / ('question', question['id'])).patch({"dependency_question": question["dependency_question"]}))
+
+
+auth_headers = _read_yaml('auth.yml')
 
 if __name__ == '__main__':
     cli()
