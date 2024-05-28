@@ -5,6 +5,7 @@ import yaml
 import click
 import json
 import os
+import collections.abc
 
 from requests import HTTPError, RequestException
 
@@ -100,31 +101,55 @@ class APILink:
     def put(self, body):
         return self.json_request('PUT', body)
 
-def flatten(x):
-    #if isinstance(x, list) and all(isinstance(y, list) for y in x):
-        return [el for y in x for el in y]
-    #return x
+def _force_type(o, idx, type, constructor):
+    try:
+        if isinstance(o[idx], type): return o[idx]
+    except (KeyError, IndexError):
+        pass
+    return constructor()
 
-def _lookup_children(obj, path, assign_refs=False):
-    if len(path) == 1:
-        if path[0] == '*':
+
+def _deep_update(d, u):
+    print("D-U",d,u)
+    for k, v in u.items() if isinstance(u, collections.abc.Mapping) else (enumerate(u)):
+        if isinstance(v, collections.abc.Mapping):
+            d[k] = _deep_update(_force_type(d, k, collections.abc.Mapping, dict), v)
+        elif isinstance(v, list):
+            d[k] = _deep_update(_force_type(d, k, list, list), v)
+        else:
+            if isinstance(d, list) and len(d) <= k:
+                d.append(v)
+            else:
+                d[k] = v
+    return d
+
+def _flatten(x):
+    return [el for y in x for el in y]
+
+def _lookup_children(obj, path, assign_refs=False, ignore_key_errors=False):
+    if path[0] != '*':
+        try:
+            child = obj[path[0]]
+        except KeyError:
+            if ignore_key_errors:
+                return []
+            else:
+                raise
+        if len(path) == 1:
+            if assign_refs and not isinstance(child, ScalarRef): child = obj[path[0]] = ScalarRef(child)
+            return [child]
+        else:
+            return _lookup_children(child, path[1:], assign_refs, ignore_key_errors)
+    else:
+        if len(path) == 1:
             if assign_refs:
                 for i, el in enumerate(obj):
                     if not isinstance(el, ScalarRef): obj[i] = ScalarRef(el)
             return obj
-        else:
-            if assign_refs and not isinstance(obj[path[0]], ScalarRef): obj[path[0]] = ScalarRef(obj[path[0]])
-            return [obj[path[0]]]
-    if path[0] == '*': return flatten([_lookup_children(x, path[1:], assign_refs) for x in obj])
-    #if isinstance(obj, list): return [x for y in obj for x in _lookup_children(y[path[0]], path[1:])]
-    return _lookup_children(obj[path[0]], path[1:], assign_refs)
+        return _flatten([_lookup_children(x, path[1:], assign_refs, ignore_key_errors) for x in obj])
 
-def _lookup_child(obj, path, assign=None):
+def _lookup_child(obj, path):
     if len(path) < 2:
-        #if assign:
-        #    obj[path[0]] = assign
-        #    return
-        #if not isinstance(obj[path[0]], ScalarRef): obj[path[0]] = ScalarRef(obj[path[0]])
         return obj[path[0]]
     return _lookup_child(obj[path[0]], path[1:])
 
@@ -143,6 +168,20 @@ def _fixup_refs(obj, where, to_where, to_what):
         except StopIteration:
             pass
 
+def _is_dict_subset(subset, superset):
+    if not isinstance(subset, dict) or not isinstance(superset, dict):
+        return False
+    for key, value in subset.items():
+        if superset.get(key) != value:
+            return False
+    return True
+
+def _kill_defaults(obj, default_file):
+    for path, defaults in default_file.items():
+        for victim in _lookup_children(obj, path.split('.')[1:], ignore_key_errors=True):
+            for key, value in defaults.items():
+                if victim.get(key) == value or _is_dict_subset(victim.get(key), value):
+                    del victim[key]
 
 def _fetch_event(apiref):
     result = {
@@ -157,10 +196,16 @@ def _fetch_event(apiref):
         'vouchers': (apiref / 'vouchers').fetch_all(),
     }
     _fixup_refs(result, '.items.*.category', '.categories.*', '.id')
+    _fixup_refs(result, '.items.*.addons.*.addon_category', '.categories.*', '.id')
     _fixup_refs(result, '.quotas.*.items.*', '.items.*', '.id')
+    _fixup_refs(result, '.quotas.*.variations.*', '.items.*.variations.*', '.id')
     if result['event']['has_subevents']:
         result['subevents'] = (apiref / 'subevents').fetch_all()
     return result
+
+def _read_yaml(filename):
+    with open(filename, 'r') as f:
+        return yaml.safe_load(f)
 
 @click.group()
 def cli():
@@ -172,12 +217,15 @@ def cli_event():
 
 @cli_event.command('fetch')
 @click.option('--file')
+@click.option('--keep-defaults')
 @click.argument('base')
 @click.argument('organizer')
 @click.argument('event')
-def fetch_event(base, organizer, event, file=None):
+def fetch_event(base, organizer, event, file=None, keep_defaults=False):
     apiref = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events' / ('event', event)
     result = _fetch_event(apiref)
+    if not keep_defaults:
+        _kill_defaults(result, _read_yaml('defaults.yml'))
     with open(file or ('_'.join(apiref.fpath) + '.yml'), 'w') as f:
         yaml.dump(result, f, sort_keys=False)
 
@@ -191,8 +239,7 @@ def fetch_event(base, organizer, event, file=None):
 def create_event(base, organizer, event, force=False, file=None):
     apiref = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events' / ('event', event)
     create_apiref = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events'
-    with open(file or ('_'.join(apiref.fpath) + '.yml'), 'r') as f:
-        event_info = yaml.safe_load(f)
+    event_info = _read_yaml(file or ('_'.join(apiref.fpath) + '.yml'))
     print(event_info)
 
     if force:
@@ -207,11 +254,11 @@ def create_event(base, organizer, event, force=False, file=None):
 
     (apiref / 'settings').patch(event_info['settings'])
     for cat in event_info['categories']:
-        cat['id'] = (apiref / 'categories').post(cat)['id']
+        _deep_update(cat, (apiref / 'categories').post(cat))
     for item in event_info['items']:
-        item['id'] = (apiref / 'items').post(item)['id']
+        _deep_update(item, (apiref / 'items').post(item))
     for quota in event_info['quotas']:
-        quota['id'] = (apiref / 'quotas').post(quota)['id']
+        _deep_update(quota, (apiref / 'quotas').post(quota))
 
 
 if __name__ == '__main__':

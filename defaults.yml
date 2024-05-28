@@ -1,0 +1,805 @@
+".event":
+  live: false
+  testmode: false
+  currency: EUR
+  date_to: null
+  date_admission: null
+  is_public: true
+  presale_start: null
+  presale_end: null
+  location: null
+  geo_lat: null
+  geo_lon: null
+  has_subevents: false
+  meta_data: {}
+  seating_plan: null
+  seat_category_mapping: {}
+  timezone: UTC
+  item_meta_properties: {}
+  valid_keys:
+    pretix_sig1: []
+  sales_channels:
+  - web
+  - pretixpos
+  - resellers
+".settings":
+  imprint_url: null
+  checkout_email_helptext:
+    en: Make sure to enter a valid email address. We will send you an order confirmation
+      including a link that you need to access your order later.
+    de: "Geben Sie eine g\xFCltige E-Mail-Adresse ein. Wir werden Ihnen an diese Adresse\
+      \ eine Bestellbest\xE4tigung schicken. Diese enth\xE4lt einen Link, den Sie\
+      \ brauchen, falls Sie sp\xE4ter auf Ihre Bestellung zugreifen m\xF6chten."
+    de-informal: "Gib eine g\xFCltige E-Mail-Adresse ein. Wir werden dir an diese\
+      \ Adresse eine Bestellbest\xE4tigung schicken. Diese enth\xE4lt einen Link,\
+      \ den du brauchst, falls du sp\xE4ter auf deine Bestellung zugreifen m\xF6chtest."
+    ar: "\u062A\u0623\u0643\u062F \u0645\u0646 \u0625\u062F\u062E\u0627\u0644 \u0639\
+      \u0646\u0648\u0627\u0646 \u0628\u0631\u064A\u062F \u0625\u0644\u0643\u062A\u0631\
+      \u0648\u0646\u064A \u0635\u0627\u0644\u062D. \u0633\u0646\u0631\u0633\u0644\
+      \ \u0625\u0644\u064A\u0643 \u062A\u0623\u0643\u064A\u062F\u0627 \u0644\u0637\
+      \u0644\u0628\u0643 \u064A\u062A\u0636\u0645\u0646 \u0631\u0627\u0628\u0637\u0627\
+      \ \u062A\u062D\u062A\u0627\u062C\u0647 \u0644\u0644\u0648\u0635\u0648\u0644\
+      \ \u0625\u0644\u0649 \u0637\u0644\u0628\u0643 \u0644\u0627\u062D\u0642\u0627\
+      ."
+    zh-hans: "\u8BF7\u52A1\u5FC5\u8F93\u5165\u6709\u6548\u7684\u7535\u5B50\u90AE\u4EF6\
+      \u5730\u5740\u3002 \u6211\u4EEC\u5C06\u5411\u60A8\u53D1\u9001\u8BA2\u5355\u786E\
+      \u8BA4\uFF0C\u5176\u4E2D\u5305\u542B\u60A8\u7A0D\u540E\u8BBF\u95EE\u8BA2\u5355\
+      \u6240\u9700\u7684\u94FE\u63A5\u3002"
+    zh-hant: "\u78BA\u4FDD\u8F38\u5165\u6709\u6548\u7684\u96FB\u5B50\u90F5\u4EF6\u4F4D\
+      \u5740\u3002\u6211\u5011\u5C07\u5411\u4F60\u767C\u9001\u8A02\u55AE\u78BA\u8A8D\
+      \uFF0C\u5176\u4E2D\u5305\u542B\u4F60\u7A0D\u5F8C\u8A2A\u554F\u8A02\u55AE\u6240\
+      \u9700\u7684\u9023\u7D50\u3002"
+    cs: "Zadejte platnou e-mailovou adresu. Za\u0161leme v\xE1m potvrzen\xED objedn\xE1\
+      vky v\u010Detn\u011B odkazu, kter\xFD pot\u0159ebujete k pozd\u011Bj\u0161\xED\
+      mu p\u0159\xEDstupu k objedn\xE1vce."
+    da: "Indtast en gyldig e-mailadresse. Vi sender en bestillingsbekr\xE6ftelse med\
+      \ et link som du skal bruge hvis du vil finde din bestilling senere."
+    nl: Zorg ervoor dat u een geldig e-mailadres opgeeft. We sturen u een bestelbevestiging
+      met een link die u nodig heeft om uw bestelling later te openen.
+    nl-informal: Zorg ervoor dat je een geldig e-mailadres opgeeft. We sturen je een
+      bestelbevestiging met een link die je nodig hebt om je bestelling later te openen.
+    fr: "Veuillez entrer une adresse e-mail valide. Nous vous enverrons une confirmation\
+      \ de votre commande et un lien si vous souhaitez modifier votre commande ult\xE9\
+      rieurement."
+    fi: "Tarkista, ett\xE4 sy\xF6t\xE4t oikean s\xE4hk\xF6postiosoitteen. L\xE4het\xE4\
+      mme sinulle tilausvahvistuksen, joka sis\xE4lt\xE4\xE4 linkin, jolla p\xE4\xE4\
+      set tarkastelemaan tilaustasi uudelleen my\xF6hemmin."
+    gl: "Aseg\xFArate de introducir un enderezo de correo electr\xF3nico v\xE1lido.\
+      \ Enviar\xE9mosche unha confirmaci\xF3n do pedido inclu\xEDndo unha ligaz\xF3\
+      n \xE1 que necesitas acceder ao teu pedido m\xE1is tarde."
+    el: "\u0392\u03B5\u03B2\u03B1\u03B9\u03C9\u03B8\u03B5\u03AF\u03C4\u03B5 \u03CC\
+      \u03C4\u03B9 \u03AD\u03C7\u03B5\u03C4\u03B5 \u03B5\u03B9\u03C3\u03B1\u03B3\u03AC\
+      \u03B3\u03B5\u03B9 \u03BC\u03B9\u03B1 \u03AD\u03B3\u03BA\u03C5\u03C1\u03B7 \u03B4\
+      \u03B9\u03B5\u03CD\u03B8\u03C5\u03BD\u03C3\u03B7 \u03B7\u03BB\u03B5\u03BA\u03C4\
+      \u03C1\u03BF\u03BD\u03B9\u03BA\u03BF\u03CD \u03C4\u03B1\u03C7\u03C5\u03B4\u03C1\
+      \u03BF\u03BC\u03B5\u03AF\u03BF\u03C5. \u0398\u03B1 \u03C3\u03B1\u03C2 \u03C3\
+      \u03C4\u03B5\u03AF\u03BB\u03BF\u03C5\u03BC\u03B5 \u03BC\u03B9\u03B1 \u03B5\u03C0\
+      \u03B9\u03B2\u03B5\u03B2\u03B1\u03AF\u03C9\u03C3\u03B7 \u03C0\u03B1\u03C1\u03B1\
+      \u03B3\u03B3\u03B5\u03BB\u03AF\u03B1\u03C2 \u03C0\u03BF\u03C5 \u03B8\u03B1 \u03C0\
+      \u03B5\u03C1\u03B9\u03BB\u03B1\u03BC\u03B2\u03AC\u03BD\u03B5\u03B9 \u03AD\u03BD\
+      \u03B1\u03BD \u03C3\u03CD\u03BD\u03B4\u03B5\u03C3\u03BC\u03BF \u03C0\u03BF\u03C5\
+      \ \u03B8\u03B1 \u03C3\u03B1\u03C2 \u03C7\u03C1\u03B5\u03B9\u03B1\u03C3\u03C4\
+      \u03B5\u03AF \u03B3\u03B9\u03B1 \u03BD\u03B1 \u03B1\u03C0\u03BF\u03BA\u03C4\u03AE\
+      \u03C3\u03B5\u03C4\u03B5 \u03C0\u03C1\u03CC\u03C3\u03B2\u03B1\u03C3\u03B7 \u03C3\
+      \u03C4\u03B7\u03BD \u03C0\u03B1\u03C1\u03B1\u03B3\u03B3\u03B5\u03BB\u03AF\u03B1\
+      \ \u03C3\u03B1\u03C2 \u03B1\u03C1\u03B3\u03CC\u03C4\u03B5\u03C1\u03B1."
+    id: Pastikan untuk memasukkan alamat email yang valid. Kami akan mengirimkan kamu
+      konfirmasi pesanan termasuk tautan yang kamu perlukan untuk mengakses pesanan
+      kamu nanti.
+    it: "Vi richiediamo di inserire un indirizzo email valido. Vi invieremo una conferma\
+      \ d'ordine che include un link che ti servir\xE0 per accedere al tuo ordine."
+    lv: "P\u0101rliecinieties, ka esat ievad\u012Bjis der\u012Bgu e-pasta adresi.\
+      \ M\u0113s jums nos\u016Bt\u012Bsim pas\u016Bt\u012Bjuma apstiprin\u0101jumu,\
+      \ iek\u013Caujot saiti, kas jums nepiecie\u0161ama, lai v\u0113l\u0101k piek\u013C\
+      \u016Btu pas\u016Bt\u012Bjumam."
+    nb-no: "Vennligst s\xF8rg for \xE5 oppgi en gyldig e-postadresse. Vi vil sende\
+      \ deg en ordrebekreftelse som inkluderer en lenke som du trenger for \xE5 f\xE5\
+      \ tilgang til bestillingen senere."
+    pl: "Upewnij si\u0119, \u017Ce wprowadzasz poprawny adres email. Prze\u015Blemy\
+      \ Ci potwierdzenie zawieraj\u0105ce link daj\u0105cy dost\u0119p do Twojego\
+      \ zam\xF3wienia."
+    pt-pt: "Certifique-se de digitar um endere\xE7o de e-mail v\xE1lido. Iremos enviar-lhe\
+      \ uma confirma\xE7\xE3o do pedido incluindo um link que voc\xEA precisa para\
+      \ aceder p seu pedido mais tarde."
+    pt-br: "Geben Sie eine g\xFCltige E-Mail-Adresse ein. Wir werden Ihnen an diese\
+      \ Adresse eine Bestellbest\xE4tigung schicken. Diese enth\xE4lt einen Link,\
+      \ den Sie brauchen, falls Sie sp\xE4ter auf Ihre Bestellung zugreifen m\xF6\
+      chten."
+    ro: "Asigura\u021Bi-v\u0103 c\u0103 introduce\u021Bi o adres\u0103 de e-mail valid\u0103\
+      . V\u0103 vom trimite o confirmare a comenzii, inclusiv un link de care ave\u021B\
+      i nevoie pentru a v\u0103 accesa comanda mai t\xE2rziu."
+    ru: "\u0423\u0431\u0435\u0434\u0438\u0442\u0435\u0441\u044C, \u0447\u0442\u043E\
+      \ \u0432\u044B \u0432\u0432\u0435\u043B\u0438 \u043F\u0440\u0430\u0432\u0438\
+      \u043B\u044C\u043D\u044B\u0439 \u0430\u0434\u0440\u0435\u0441 \u044D\u043B\u0435\
+      \u043A\u0442\u0440\u043E\u043D\u043D\u043E\u0439 \u043F\u043E\u0447\u0442\u044B\
+      . \u041C\u044B \u0432\u044B\u0448\u043B\u0435\u043C \u0432\u0430\u043C \u043F\
+      \u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u0438\u0435 \u0437\
+      \u0430\u043A\u0430\u0437\u0430, \u0432\u043A\u043B\u044E\u0447\u0430\u044F \u0441\
+      \u0441\u044B\u043B\u043A\u0443, \u043A\u043E\u0442\u043E\u0440\u0430\u044F \u043F\
+      \u043E\u043D\u0430\u0434\u043E\u0431\u0438\u0442\u0441\u044F \u0432\u0430\u043C\
+      \ \u0434\u043B\u044F \u043F\u043E\u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\
+      \u0433\u043E \u0434\u043E\u0441\u0442\u0443\u043F\u0430 \u043A \u0432\u0430\u0448\
+      \u0435\u043C\u0443 \u0437\u0430\u043A\u0430\u0437\u0443."
+    es: "Aseg\xFArese de introducir una direcci\xF3n de correo electr\xF3nico v\xE1\
+      lida. Le enviaremos una confirmaci\xF3n del pedido incluyendo un enlace al que\
+      \ deber\xE1 acceder m\xE1s tarde."
+    tr: "Ge\xE7erli bir e-posta adresi girdi\u011Finizden emin olun. Sipari\u015F\
+      inize daha sonra eri\u015Fmek i\xE7in ihtiyac\u0131n\u0131z olan bir ba\u011F\
+      lant\u0131y\u0131 i\xE7eren bir sipari\u015F onay\u0131 g\xF6nderece\u011Fiz."
+    uk: "\u041F\u0435\u0440\u0435\u043A\u043E\u043D\u0430\u0439\u0442\u0435\u0441\u044C\
+      , \u0449\u043E \u0432\u0438 \u0432\u0432\u0435\u043B\u0438 \u0434\u0456\u0439\
+      \u0441\u043D\u0443 \u0435\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u0443\
+      \ \u0430\u0434\u0440\u0435\u0441\u0443. \u041C\u0438 \u043D\u0430\u0434\u0456\
+      \u0448\u043B\u0435\u043C\u043E \u0432\u0430\u043C \u043F\u0456\u0434\u0442\u0432\
+      \u0435\u0440\u0434\u0436\u0435\u043D\u043D\u044F \u0432\u0430\u0448\u043E\u0433\
+      \u043E \u0437\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F \u0440\u0430\
+      \u0437\u043E\u043C \u0456\u0437 \u043F\u043E\u0441\u0438\u043B\u0430\u043D\u043D\
+      \u044F \u0434\u043B\u044F \u0434\u043E\u0441\u0442\u0443\u043F\u0443 \u0434\u043E\
+      \ \u0432\u0430\u0448\u043E\u0433\u043E \u0437\u0430\u043C\u043E\u0432\u043B\u0435\
+      \u043D\u043D\u044F."
+  presale_has_ended_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  voucher_explanation_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  checkout_success_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  banner_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  banner_text_bottom:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  show_dates_on_frontpage: true
+  show_date_to: true
+  show_times: true
+  show_items_outside_presale_period: true
+  display_net_prices: false
+  hide_prices_from_attendees: true
+  presale_start_show_date: true
+  region: null
+  allow_modifications: order
+  allow_modifications_after_checkin: false
+  last_order_modification_date: null
+  show_quota_left: false
+  waiting_list_enabled: false
+  waiting_list_auto_disable: null
+  waiting_list_hours: 48
+  waiting_list_auto: true
+  waiting_list_names_asked: false
+  waiting_list_names_required: false
+  waiting_list_phones_asked: false
+  waiting_list_phones_required: false
+  waiting_list_phones_explanation_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  waiting_list_limit_per_user: 1
+  max_items_per_order: 10
+  reservation_time: 30
+  contact_mail: null
+  show_variations_expanded: false
+  hide_sold_out: false
+  meta_noindex: false
+  redirect_to_checkout_directly: false
+  frontpage_subevent_ordering: date_ascending
+  event_list_type: calendar
+  event_list_available_only: false
+  event_list_filters: true
+  event_calendar_future_only: false
+  frontpage_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  event_info_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  attendee_names_asked: true
+  attendee_names_required: false
+  attendee_emails_asked: false
+  attendee_emails_required: false
+  attendee_addresses_asked: false
+  attendee_addresses_required: false
+  attendee_company_asked: false
+  attendee_company_required: false
+  attendee_data_explanation_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  confirm_texts: []
+  order_email_asked_twice: false
+  order_phone_asked: false
+  order_phone_required: false
+  checkout_phone_helptext:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  payment_term_mode: days
+  payment_term_days: 14
+  payment_term_weekdays: true
+  payment_term_minutes: 30
+  payment_term_last: null
+  payment_term_expire_automatically: true
+  payment_term_expire_delay_days: 0
+  payment_term_accept_late: true
+  payment_explanation:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  payment_pending_hidden: false
+  payment_giftcard__enabled: true
+  mail_days_order_expire_warning: 3
+  ticket_download: false
+  ticket_download_date: null
+  ticket_download_addons: false
+  ticket_download_nonadm: true
+  ticket_download_pending: false
+  ticket_download_require_validated_email: false
+  ticket_secret_length: 32
+  mail_prefix: null
+  mail_from_name: null
+  mail_attach_ical: false
+  mail_attach_tickets: true
+  invoice_address_asked: true
+  invoice_address_required: false
+  invoice_address_vatid: false
+  invoice_address_company_required: false
+  invoice_address_beneficiary: false
+  invoice_address_custom_field:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  invoice_name_required: false
+  invoice_address_not_asked_free: false
+  invoice_show_payments: true
+  invoice_reissue_after_modify: false
+  invoice_include_free: true
+  invoice_generate: 'False'
+  invoice_numbers_consecutive: true
+  invoice_numbers_prefix: ''
+  invoice_numbers_prefix_cancellations: ''
+  invoice_numbers_counter_length: 5
+  invoice_attendee_name: true
+  invoice_event_location: false
+  invoice_include_expire_date: true
+  invoice_address_explanation_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  invoice_email_attachment: true
+  invoice_email_organizer: ''
+  invoice_address_from_name: ''
+  invoice_address_from: ''
+  invoice_address_from_zipcode: ''
+  invoice_address_from_city: ''
+  invoice_address_from_country: ''
+  invoice_address_from_tax_id: ''
+  invoice_address_from_vat_id: ''
+  invoice_introductory_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  invoice_additional_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  invoice_footer_text:
+    en: ''
+    de: ''
+    de-informal: ''
+    ar: ''
+    zh-hans: ''
+    zh-hant: ''
+    cs: ''
+    da: ''
+    nl: ''
+    nl-informal: ''
+    fr: ''
+    fi: ''
+    gl: ''
+    el: ''
+    id: ''
+    it: ''
+    lv: ''
+    nb-no: ''
+    pl: ''
+    pt-pt: ''
+    pt-br: ''
+    ro: ''
+    ru: ''
+    es: ''
+    tr: ''
+    uk: ''
+  invoice_eu_currencies: 'True'
+  invoice_logo_image: null
+  invoice_renderer_highlight_order_code: true
+  cancel_allow_user: true
+  cancel_allow_user_until: null
+  cancel_allow_user_unpaid_keep: '0.00'
+  cancel_allow_user_unpaid_keep_fees: false
+  cancel_allow_user_unpaid_keep_percentage: '0.00'
+  cancel_allow_user_paid: false
+  cancel_allow_user_paid_until: null
+  cancel_allow_user_paid_keep: '0.00'
+  cancel_allow_user_paid_keep_fees: false
+  cancel_allow_user_paid_keep_percentage: '0.00'
+  cancel_allow_user_paid_adjust_fees: false
+  cancel_allow_user_paid_adjust_fees_explanation:
+    de: "Wenn Sie uns jedoch unterst\xFCtzen m\xF6chten, unsere Arbeit fortzuf\xFC\
+      hren, denken Sie bitte dar\xFCber nach mit dem Schieber einen niedrigeren Erstattungsbetrag\
+      \ auszuw\xE4hlen, sodass wir einen h\xF6heren Betrag einbehalten k\xF6nnen.\
+      \ Vielen Dank!"
+  cancel_allow_user_paid_adjust_fees_step: null
+  cancel_allow_user_paid_refund_as_giftcard: 'off'
+  cancel_allow_user_paid_require_approval: false
+  cancel_allow_user_paid_require_approval_fee_unknown: false
+  cancel_terms_paid: null
+  cancel_terms_unpaid: null
+  change_allow_user_variation: false
+  change_allow_user_addons: false
+  change_allow_user_until: null
+  change_allow_user_price: gte
+  change_allow_attendee: false
+  primary_color: '#ff00ff'
+  theme_color_success: '#50a167'
+  theme_color_danger: '#c44f4f'
+  theme_color_background: '#f5f5f5'
+  theme_round_borders: true
+  primary_font: Open Sans
+  logo_image: null
+  logo_image_large: false
+  logo_show_title: true
+  og_image: null
+  name_scheme: given_family
+  reusable_media_active: false
+  reusable_media_type_barcode: false
+  reusable_media_type_barcode_identifier_length: 24
+  reusable_media_type_nfc_uid: false
+  reusable_media_type_nfc_uid_autocreate_giftcard: false
+  reusable_media_type_nfc_uid_autocreate_giftcard_currency: EUR
+  reusable_media_type_nfc_mf0aes: false
+  reusable_media_type_nfc_mf0aes_autocreate_giftcard: false
+  reusable_media_type_nfc_mf0aes_autocreate_giftcard_currency: EUR
+  reusable_media_type_nfc_mf0aes_random_uid: false
+  pretixpos_additional_receipt_text: null
+".quotas.*":
+  size: null
+  variations: []
+  subevent: null
+  closed: false
+  close_when_sold_out: false
+  release_after_exit: false
+".items.*":
+  category: null
+  internal_name: null
+  active: true
+  sales_channels:
+  - web
+  description: null
+  free_price: false
+  free_price_suggestion: null
+  tax_rate: '0.00'
+  tax_rule: null
+  admission: false
+  personalized: false
+  position: 0
+  picture: null
+  available_from: null
+  available_from_mode: hide
+  available_until: null
+  available_until_mode: hide
+  require_voucher: false
+  hide_without_voucher: false
+  allow_cancel: true
+  require_bundling: false
+  min_per_order: null
+  max_per_order: null
+  checkin_attention: false
+  checkin_text: null
+  has_variations: false
+  variations: []
+  addons: []
+  bundles: []
+  original_price: null
+  require_approval: false
+  generate_tickets: null
+  show_quota_left: null
+  hidden_if_available: null
+  hidden_if_item_available: null
+  allow_waitinglist: true
+  issue_giftcard: false
+  meta_data: {}
+  require_membership: false
+  require_membership_types: []
+  require_membership_hidden: false
+  grant_membership_type: null
+  grant_membership_duration_like_event: true
+  grant_membership_duration_days: 0
+  grant_membership_duration_months: 0
+  validity_mode: null
+  validity_fixed_from: null
+  validity_fixed_until: null
+  validity_dynamic_duration_minutes: null
+  validity_dynamic_duration_hours: null
+  validity_dynamic_duration_days: null
+  validity_dynamic_duration_months: null
+  validity_dynamic_start_choice: false
+  validity_dynamic_start_choice_day_limit: null
+  media_policy: null
+  media_type: null
+".items.*.variations.*":
+  active: true
+  description: null
+  position: 0
+  default_price: null
+  original_price: null
+  free_price_suggestion: null
+  require_approval: false
+  require_membership: false
+  require_membership_types: []
+  require_membership_hidden: false
+  checkin_attention: false
+  checkin_text: null
+  available_from: null
+  available_from_mode: hide
+  available_until: null
+  available_until_mode: hide
+  sales_channels:
+  - web
+  - pretixpos
+  - resellers
+  hide_without_voucher: false
+  meta_data: {}
