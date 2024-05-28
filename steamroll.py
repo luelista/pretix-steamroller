@@ -134,10 +134,14 @@ def _flatten(x):
 
 def _lookup_children(obj, path, assign_refs=False, ignore_key_errors=False, with_path=None):
     if path[0] != '*':
+        ignore_key_errors_local = False
+        if path[0].endswith('?'):
+            path[0] = path[0][:-1]
+            ignore_key_errors_local = True
         try:
             child = obj[path[0]]
         except KeyError:
-            if ignore_key_errors:
+            if ignore_key_errors or ignore_key_errors_local:
                 return []
             else:
                 raise
@@ -210,7 +214,7 @@ def _fetch_event(apiref):
     _fixup_refs(result, '.vouchers.*.variation', '.items.*.variations.*', '.id')
     _fixup_refs(result, '.questions.*.items.*', '.items.*', '.id')
     _fixup_refs(result, '.questions.*.dependency_question', '.questions.*', '.id')
-    _fixup_refs(result, '.categories.*.cross_selling_match_products.*', '.items.*', '.id')
+    _fixup_refs(result, '.categories.*.cross_selling_match_products?.*', '.items.*', '.id')
 
     if result['event']['has_subevents']:
         result['subevents'] = (apiref / 'subevents').fetch_all()
