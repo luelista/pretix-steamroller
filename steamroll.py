@@ -4,10 +4,9 @@ import requests
 import yaml
 import click
 import json
-import os
 import collections.abc
 
-from requests import HTTPError, RequestException
+from requests import RequestException
 
 ref_root = None
 
@@ -91,9 +90,10 @@ class APILink:
             res.raise_for_status()
             return res.json()
         except RequestException as e:
-            print("URL: ",method, self.__str__())
-            print("Sent: ",data)
-            print("Got: ",res.text)
+            print("Error: ", str(e))
+            print("URL:   ", method, self.__str__())
+            print("Sent:  ", data)
+            print("Got:   ", res.status_code, res.text)
             raise
 
     def post(self, body):
@@ -102,6 +102,11 @@ class APILink:
         return self.json_request('PATCH', body)
     def put(self, body):
         return self.json_request('PUT', body)
+    def delete(self):
+        res = requests.request('DELETE', self.__str__(),
+              headers={'Content-Type': 'application/json', 'Accept': 'application/json', **self.headers})
+        res.raise_for_status()
+
 
 def _force_type(o, idx, type, constructor):
     try:
@@ -246,21 +251,20 @@ def fetch_event(base, organizer, event, file=None, keep_defaults=False):
 @click.argument('event')
 def create_event(base, organizer, event, force=False, file=None):
     global ref_root
-    apiref = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events' / ('event', event)
-    create_apiref = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events'
+    events_base_api = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events'
+    apiref = events_base_api / ('event', event)
     event_info = _read_yaml(file or ('_'.join(apiref.fpath) + '.yml'))
     ref_root = event_info
-    print(event_info)
 
     if force:
         try:
-            apiref.json_request('DELETE', {})
+            apiref.delete()
         except:
             pass
 
     event_info['event']['slug'] = event
 
-    print(create_apiref.post({**event_info['event'], 'live': False}))
+    event_response = events_base_api.post({**event_info['event'], 'live': False})
 
     (apiref / 'settings').patch(event_info['settings'])
     for item_meta_property in event_info['item_meta_properties']:
@@ -285,6 +289,8 @@ def create_event(base, organizer, event, force=False, file=None):
     for question in event_info['questions']:
         if question.get("dependency_question"):
             _deep_update(question, (apiref / 'questions' / ('question', question['id'])).patch({"dependency_question": question["dependency_question"]}))
+
+    print("Success: " + event_response['public_url'])
 
 
 auth_headers = _read_yaml('auth.yml')
