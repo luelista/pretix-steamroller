@@ -208,6 +208,7 @@ def _fetch_event(apiref):
     _fixup_refs(result, '.vouchers.*.variation', '.items.*.variations.*', '.id')
     _fixup_refs(result, '.questions.*.items.*', '.items.*', '.id')
     _fixup_refs(result, '.questions.*.dependency_question', '.questions.*', '.id')
+    _fixup_refs(result, '.categories.*.cross_selling_match_products.*', '.items.*', '.id')
 
     if result['event']['has_subevents']:
         result['subevents'] = (apiref / 'subevents').fetch_all()
