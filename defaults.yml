@@ -719,6 +719,15 @@
   pretixpos_additional_receipt_text: null
 
 
+".categories.*":
+  internal_name: null
+  description: {}
+  is_addon: false
+  cross_selling_mode: null
+  cross_selling_condition: null
+  cross_selling_match_products: []
+
+
 ".quotas.*":
   size: null
   variations: []
@@ -741,7 +750,6 @@
   tax_rule: null
   admission: false
   personalized: false
-  position: 0
   picture: null
   available_from: null
   available_from_mode: hide
@@ -790,7 +798,6 @@
 ".items.*.variations.*":
   active: true
   description: null
-  position: 0
   default_price: null
   original_price: null
   free_price_suggestion: null
@@ -857,4 +864,32 @@
   valid_datetime_max: null
   valid_string_length_max: null
   valid_file_portrait: false
+
+".taxrules.*":
+  price_includes_tax: true
+  eu_reverse_charge: false
+  home_country: ''
+  internal_name: null
+  keep_gross_if_rate_changes: false
+  custom_rules: null
+
+".discounts.*":
+  active: true
+  sales_channels:
+  - web
+  available_from: null
+  available_until: null
+  subevent_mode: mixed
+  condition_all_products: true
+  condition_limit_products: []
+  condition_apply_to_addons: true
+  condition_min_count: 0
+  condition_min_value: '0.00'
+  benefit_discount_matching_percent: '0.00'
+  benefit_only_apply_to_cheapest_n_matches: null
+  benefit_same_products: true
+  benefit_limit_products: []
+  benefit_apply_to_addons: true
+  benefit_ignore_voucher_discounted: false
+  condition_ignore_voucher_discounted: false
 
