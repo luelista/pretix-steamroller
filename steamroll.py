@@ -1,4 +1,5 @@
 import os.path
+import time
 from base64 import b64encode
 from copy import deepcopy
 from json import JSONEncoder
@@ -6,6 +7,7 @@ from bs4 import BeautifulSoup
 
 import requests
 import yaml
+import ruamel.yaml
 import click
 import json
 import collections.abc
@@ -77,7 +79,10 @@ class APILink:
 
     @property
     def headers(self):
-        return self._headers[self.api_base]
+        try:
+            return self._headers[self.api_base + '/' + self.vars['organizer']]
+        except:
+            return self._headers[self.api_base]
 
     def __truediv__(self, other):
         vars = self.vars
@@ -127,12 +132,19 @@ class APILink:
             results.extend(response['results'])
         return results
 
+    def _do_form_request(self, method, body):
+        try:
+            res = requests.request(method, self.__str__(), data=body, headers=self.headers)
+            res.raise_for_status()
+            return res.json()
+        except RequestException as e:
+            _print_request_error(e)
+            raise
+
     def _do_json_request(self, method, body):
-        res = None
         try:
             data = json.dumps(body, cls=SRJSONEncoder)
-            res = requests.request(method, self.__str__(),
-                  data=data,
+            res = requests.request(method, self.__str__(), data=data,
                   headers={'Content-Type': 'application/json', 'Accept': 'application/json', **self.headers})
             res.raise_for_status()
             return res.json()
@@ -338,7 +350,12 @@ def _fetch_event_to_file(base, organizer, event, file=None, keep_defaults=False,
 
 def _read_yaml(filename):
     with open(filename, 'r') as f:
-        return yaml.safe_load(f)
+        return ruamel.yaml.YAML().load(f)
+
+def _write_yaml(filename, data):
+    with open(filename, 'w') as f:
+        ruamel.yaml.YAML().dump(data, f)
+
 
 @click.group()
 def cli():
@@ -361,10 +378,11 @@ def fetch_event(base, organizer, event, file=None, keep_defaults=False, keep_ids
 @cli_event.command('create')
 @click.option('--force', is_flag=True, help='Force override event, deleting any pre-existing data (incl. orders etc)')
 @click.option('--file', '-f')
+@click.option('--arg', '-a', type=(str, str), multiple=True)
 @click.argument('base')
 @click.argument('organizer')
 @click.argument('event')
-def create_event(base, organizer, event, force=False, file=None):
+def create_event(base, organizer, event, arg, force=False, file=None):
     global ref_root
     events_base_api = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events'
     apiref = events_base_api / ('event', event)
@@ -378,6 +396,7 @@ def create_event(base, organizer, event, force=False, file=None):
             _print_request_error(e)
 
     event_info['event']['slug'] = event
+    event_info['args'] = dict(arg)
 
     event_create_body = dict(**event_info['event'])
     event_create_body.pop('live', 0)
@@ -460,6 +479,16 @@ def oauth_grant(base):
             "Authorization": "Basic "+b64encode((conf["client_id"] + ":" + conf["client_secret"]).encode("utf-8")).decode("ascii")
         }
     }
+    token_link = link / "oauth" / "token"
+    token_link.link_format = "{}/api/v1/{}"
+    if "refresh_token" in conf:
+        response = token_link._do_form_request('POST', { 'grant_type': 'refresh_token', 'refresh_token': conf["refresh_token"] },)
+        print(response)
+        auth = _read_yaml('auth.yml')
+        auth[link.api_base].update({"Authorization": "{} {}".format(response['token_type'], response['access_token'])})
+        _write_yaml('auth.yml', auth)
+        return
+
     url = "{}/api/v1/oauth/authorize?client_id={}&response_type=code&scope=read+write&redirect_uri={}".format(link.api_base, conf['client_id'], conf['redirect_uri'])
     print("pls open in your browser:")
     print(url)
@@ -469,17 +498,14 @@ def oauth_grant(base):
     if "?code=" in code:
         code = code.split("?code=")[1]
     print(code)
-    response = requests.post(
-        "{}/api/v1/oauth/token".format(link.api_base),
-        data={ 'grant_type': 'authorization_code', 'code': code, 'redirect_uri': conf['redirect_uri'] },
-        headers={
-            "Authorization": "Basic "+b64encode((conf["client_id"] + ":" + conf["client_secret"]).encode("utf-8")).decode("ascii")
-        }
-    ).json()
-    token_link = link / "oauth" / "token"
-    token_link.link_format = link_format = "{}/api/v1/{}"
-    #response = token_link.post()
+    response = token_link._do_form_request('post', { 'grant_type': 'authorization_code', 'code': code, 'redirect_uri': conf['redirect_uri'] })
     print(response)
+    auth = _read_yaml('auth.yml')
+    auth[link.api_base].update({"Authorization": "{} {}".format(response['token_type'], response['access_token'])})
+    _write_yaml('auth.yml', auth)
+    oauth_conf[link.api_base]['refresh_token'] = response['refresh_token']
+    oauth_conf[link.api_base]['expires'] = int(time.time()) + int(response['expires_in'])
+    _write_yaml('oauth.yml', oauth_conf)
 
 auth_headers = _read_yaml('auth.yml')
 

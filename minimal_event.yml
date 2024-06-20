@@ -1,0 +1,38 @@
+event:
+  name:
+    de: !<ref> [event, slug]
+  date_from: '2025-01-01T00:00:00Z'
+  plugins:
+  - pretix.plugins.sendmail
+  - pretix.plugins.statistics
+  - pretix_fakepayment
+  - !<ref> [args, plugin]
+
+settings:
+  imprint_url: https://example.com/imprint.aspx
+  contact_mail: noreply@example.com
+  locales:
+  - de
+  locale: de
+  region: ''
+
+taxrules: []
+
+categories:
+- id: 46
+  name:
+    de: MEOW_CAT
+  description:
+    de: ''
+
+items:
+- category: !<ref> [categories, 0, id]
+  name:
+    de: MEOW_ITEM
+  default_price: '100.00'
+
+quotas:
+- id: 224
+  name: MEOW_QUOTA
+  items:
+  - !<ref> [items, 0, id]
