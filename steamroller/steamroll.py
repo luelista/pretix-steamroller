@@ -149,6 +149,8 @@ def _fetch_event_data(apiref):
         print("Failed to load payment provider info")
     _fixup_refs(result, '.items.*.category', '.categories.*', '.id')
     _fixup_refs(result, '.items.*.addons.*.addon_category', '.categories.*', '.id')
+    _fixup_refs(result, '.items.*.bundles.*.bundled_item', '.items.*', '.id')
+    _fixup_refs(result, '.items.*.bundles.*.bundled_variation', '.items.*.variations.*', '.id')
     _fixup_refs(result, '.quotas.*.items.*', '.items.*', '.id')
     _fixup_refs(result, '.quotas.*.variations.*', '.items.*.variations.*', '.id')
     _fixup_refs(result, '.vouchers.*.item', '.items.*', '.id')
