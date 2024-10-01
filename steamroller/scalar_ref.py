@@ -1,6 +1,6 @@
 from json import JSONEncoder
 
-import ruamel.yaml
+import yaml
 
 
 ref_root = None
@@ -30,7 +30,7 @@ class ScalarRef:
         return self.v == other.v if isinstance(other, ScalarRef) else self.v == other
 
 
-ruamel.yaml.SafeConstructor.add_constructor('ref', lambda loader, node: ScalarRef(ref=loader.construct_sequence(node)))
+yaml.add_constructor('ref', lambda loader, node: ScalarRef(ref=loader.construct_sequence(node)), yaml.SafeLoader)
 
 
 class SRJSONEncoder(JSONEncoder):

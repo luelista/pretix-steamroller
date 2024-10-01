@@ -203,10 +203,17 @@ def _fetch_event_to_file(base, organizer, event, file=None, keep_defaults=False,
         yaml.dump(result, f, sort_keys=False, Dumper=MyDumper)
 
 def _read_yaml(filename):
+    """Read yaml using the PyYAML library, which allows us to parse !<ref> tags"""
+    with open(filename, 'r') as f:
+        return yaml.safe_load(f)
+
+def _read_yaml_r(filename):
+    """Read yaml using the ruamel yaml library, which keeps comments and formatting on round trip"""
     with open(filename, 'r') as f:
         return ruamel.yaml.YAML(typ='safe', pure=True).load(f)
 
-def _write_yaml(filename, data):
+def _write_yaml_r(filename, data):
+    """Write yaml using the ruamel yaml library, which keeps comments and formatting on round trip"""
     with open(filename, 'w') as f:
         ruamel.yaml.YAML().dump(data, f)
 
@@ -328,7 +335,7 @@ def cli_auth():
 @cli_auth.command('oauth')
 @click.argument('base')
 def oauth_grant(base):
-    oauth_conf = _read_yaml('oauth.yml')
+    oauth_conf = _read_yaml_r('oauth.yml')
     link = APILink(base, {})
     conf = oauth_conf[link.api_base]
     link._headers = {
@@ -341,9 +348,9 @@ def oauth_grant(base):
     if "refresh_token" in conf:
         response = token_link._do_form_request('POST', { 'grant_type': 'refresh_token', 'refresh_token': conf["refresh_token"] },)
         print(response)
-        auth = _read_yaml('auth.yml')
+        auth = _read_yaml_r('auth.yml')
         auth[link.api_base].update({"Authorization": "{} {}".format(response['token_type'], response['access_token'])})
-        _write_yaml('auth.yml', auth)
+        _write_yaml_r('auth.yml', auth)
         return
 
     url = "{}/api/v1/oauth/authorize?client_id={}&response_type=code&scope=read+write&redirect_uri={}".format(link.api_base, conf['client_id'], conf['redirect_uri'])
@@ -357,14 +364,14 @@ def oauth_grant(base):
     print(code)
     response = token_link._do_form_request('post', { 'grant_type': 'authorization_code', 'code': code, 'redirect_uri': conf['redirect_uri'] })
     print(response)
-    auth = _read_yaml('auth.yml')
+    auth = _read_yaml_r('auth.yml')
     auth[link.api_base].update({"Authorization": "{} {}".format(response['token_type'], response['access_token'])})
-    _write_yaml('auth.yml', auth)
+    _write_yaml_r('auth.yml', auth)
     oauth_conf[link.api_base]['refresh_token'] = response['refresh_token']
     oauth_conf[link.api_base]['expires'] = int(time.time()) + int(response['expires_in'])
-    _write_yaml('oauth.yml', oauth_conf)
+    _write_yaml_r('oauth.yml', oauth_conf)
 
-auth_headers = _read_yaml('auth.yml')
+auth_headers = _read_yaml_r('auth.yml')
 
 if __name__ == '__main__':
     wrapped_cli()
