@@ -1,0 +1,56 @@
+event:
+  name:
+    de: !<ref> [event, slug]
+  date_from: '2030-02-01T00:00:00Z'
+  testmode: true
+  plugins:
+  - pretix.plugins.sendmail
+  - pretix.plugins.statistics
+  - pretix_fakepayment
+  #- !<ref> [args, plugin]
+
+settings:
+  imprint_url: https://example.com/imprint.aspx
+  contact_mail: noreply@example.com
+  locales:
+  - de
+  locale: de
+  region: ''
+
+taxrules: []
+
+categories:
+- name:
+    de: MEOW_CAT
+  description:
+    de: ''
+
+items:
+- category: !<ref> [categories, 0, id]
+  name:
+    de: MEOW_ITEM
+  default_price: '100.00'
+  has_variations: true
+  variations:
+  - value:
+      en: Early Bird
+    description: {}
+    position: 0
+    default_price: '75.00'
+    checkin_text: ''
+    available_until: '2020-01-01T00:00:00Z'
+  - value:
+      en: Regular
+    description: {}
+    position: 1
+    default_price: '100.00'
+    checkin_text: ''
+    available_from: '2020-01-01T00:00:00Z'
+
+quotas:
+- name: MEOW_QUOTA
+  items:
+  - !<ref> [items, 0, id]
+  variations:
+  - !<ref> [items, 0, variations, 0, id]
+  - !<ref> [items, 0, variations, 1, id]

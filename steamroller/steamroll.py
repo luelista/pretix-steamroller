@@ -1,34 +1,14 @@
+import collections.abc
 import os.path
 import time
 from base64 import b64encode
-from copy import deepcopy
-from json import JSONEncoder
-from bs4 import BeautifulSoup
 
-import requests
-import yaml
-import ruamel.yaml
 import click
-import json
-import collections.abc
-
+import ruamel.yaml
+import yaml
 from requests import RequestException
-
-ref_root = None
-
-class ScalarRef:
-    def __init__(self, v=None, ref=None):
-        self.v = v
-        self.ref = ref
-
-    def deref(self):
-        return _lookup_child(ref_root, self.ref)
-
-    def __repr__(self):
-        return "SR:"+str(self.v)
-
-    def __eq__(self, other):
-        return self.v == other.v if isinstance(other, ScalarRef) else self.v == other
+from .api_link import APILink, print_request_error
+from .scalar_ref import ScalarRef, lookup_child, set_ref_root
 
 
 class MyDumper(yaml.SafeDumper):
@@ -41,127 +21,6 @@ class MyDumper(yaml.SafeDumper):
             super().write_line_break()
 
 MyDumper.add_representer(ScalarRef, lambda dumper, data: dumper.represent_sequence('ref', data.ref, flow_style=True) if data.ref else dumper.represent_data(data.v))
-
-yaml.SafeLoader.add_constructor('ref', lambda loader, node: ScalarRef(ref=loader.construct_sequence(node)))
-
-
-class SRJSONEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, ScalarRef):
-            return obj.deref()
-        return super().default(obj)
-
-def _print_request_error(e: RequestException):
-    print("Error: ", str(e))
-    print("URL:   ", e.request.method, e.request.url)
-    if hasattr(e.request, 'data'): print("Sent:  ", e.request.data)
-    print("Got:   ", e.response.status_code, e.response.text)
-
-class APILink:
-    link_format = "{}/api/v1/{}/"
-    def __init__(self, api_base, headers, path=[], vars={}):
-        if not api_base.startswith("http:") and not api_base.startswith("https:"):
-            if api_base.startswith("localhost:"):
-                api_base = "http://" + api_base
-            else:
-                api_base = "https://" + api_base
-        self.api_base = api_base
-        self._headers = headers
-        self.path = path
-        self.vars = vars
-
-    def __str__(self):
-        return self.link_format.format(self.api_base, "/".join(self.fpath))
-
-    @property
-    def fpath(self):
-        return (el.format(**self.vars) for el in self.path)
-
-    @property
-    def headers(self):
-        try:
-            return self._headers[self.api_base + '/' + self.vars['organizer']]
-        except:
-            return self._headers[self.api_base]
-
-    def __truediv__(self, other):
-        vars = self.vars
-        if isinstance(other, str):
-            other = [other]
-        elif isinstance(other, tuple):
-            varname, varvalue = other
-            vars = dict(**vars, **{varname: varvalue})
-            other = ['{' + varname + '}']
-        new = APILink(self.api_base, self._headers, self.path + other, vars)
-        new.link_format = self.link_format
-        return new
-
-    def __floordiv__(self, other):
-        new = deepcopy(self)
-        new.path = []
-        return new / other
-
-    def with_(self, link_format):
-        l = deepcopy(self)
-        l.link_format = '{}/control/{}'
-        return l
-
-    def _do_get_request(self, url=None):
-        try:
-            res = requests.get(url or self.__str__(), headers=self.headers)
-            res.raise_for_status()
-            return res
-        except RequestException as e:
-            print("Error: ", str(e))
-            print("URL:   ", 'GET', self.__str__())
-            print("Got:   ", res.status_code, res.text)
-            raise
-
-    def get_html(self):
-        return BeautifulSoup(self._do_get_request().text, 'html.parser')
-
-    def fetch_single(self):
-        return self._do_get_request().json()
-
-    def fetch_all(self):
-        results = []
-        response = self._do_get_request().json()
-        results.extend(response['results'])
-        while response.get('next'):
-            response = self._do_get_request(response['next']).json()
-            results.extend(response['results'])
-        return results
-
-    def _do_form_request(self, method, body):
-        try:
-            res = requests.request(method, self.__str__(), data=body, headers=self.headers)
-            res.raise_for_status()
-            return res.json()
-        except RequestException as e:
-            _print_request_error(e)
-            raise
-
-    def _do_json_request(self, method, body):
-        try:
-            data = json.dumps(body, cls=SRJSONEncoder)
-            res = requests.request(method, self.__str__(), data=data,
-                  headers={'Content-Type': 'application/json', 'Accept': 'application/json', **self.headers})
-            res.raise_for_status()
-            return res.json()
-        except RequestException as e:
-            _print_request_error(e)
-            raise
-
-    def post(self, body):
-        return self._do_json_request('POST', body)
-    def patch(self, body):
-        return self._do_json_request('PATCH', body)
-    def put(self, body):
-        return self._do_json_request('PUT', body)
-    def delete(self):
-        res = requests.request('DELETE', self.__str__(),
-              headers={'Content-Type': 'application/json', 'Accept': 'application/json', **self.headers})
-        res.raise_for_status()
 
 
 def _force_type(o, idx, type, constructor):
@@ -223,18 +82,13 @@ def _lookup_children(obj, path, assign_refs=False, ignore_key_errors=False, with
             return [(with_path + [i], child) for i, child in _kv(obj)] if with_path is not None else obj
         return _flatten([_lookup_children(x, path[1:], assign_refs, ignore_key_errors, with_path + [i] if with_path is not None else None, delete) for i, x in _kv(obj)])
 
-def _lookup_child(obj, path):
-    if len(path) < 2:
-        return obj[path[0]]
-    return _lookup_child(obj[path[0]], path[1:])
-
 def _fixup_refs(obj, where, to_where, to_what):
     to_what = to_what.split('.')[1:]
     to_objs = _lookup_children(obj, to_where, with_path=[])
     from_obj = _lookup_children(obj, where, assign_refs=True)
     for from_id in from_obj:
         try:
-            path, ref = next((path, y) for (path, y) in to_objs if _lookup_child(y, to_what) == from_id)
+            path, ref = next((path, y) for (path, y) in to_objs if lookup_child(y, to_what) == from_id)
             from_id.ref = path + to_what
         except StopIteration:
             pass
@@ -350,12 +204,17 @@ def _fetch_event_to_file(base, organizer, event, file=None, keep_defaults=False,
 
 def _read_yaml(filename):
     with open(filename, 'r') as f:
-        return ruamel.yaml.YAML().load(f)
+        return ruamel.yaml.YAML(typ='safe', pure=True).load(f)
 
 def _write_yaml(filename, data):
     with open(filename, 'w') as f:
         ruamel.yaml.YAML().dump(data, f)
 
+def wrapped_cli():
+    try:
+        cli()
+    except RequestException as e:
+        print_request_error(e)
 
 @click.group()
 def cli():
@@ -383,17 +242,16 @@ def fetch_event(base, organizer, event, file=None, keep_defaults=False, keep_ids
 @click.argument('organizer')
 @click.argument('event')
 def create_event(base, organizer, event, arg, force=False, file=None):
-    global ref_root
     events_base_api = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events'
     apiref = events_base_api / ('event', event)
     event_info = _read_yaml(file or ('_'.join(apiref.fpath) + '.yml'))
-    ref_root = event_info
+    set_ref_root(event_info)
 
     if force:
         try:
             apiref.delete()
         except RequestException as e:
-            _print_request_error(e)
+            print_request_error(e)
 
     event_info['event']['slug'] = event
     event_info['args'] = dict(arg)
@@ -446,11 +304,10 @@ def create_event(base, organizer, event, arg, force=False, file=None):
 @click.argument('organizer')
 @click.argument('event')
 def update_event(base, organizer, event, file=None, discounts=False):
-    global ref_root
     events_base_api = APILink(base, auth_headers) / 'organizers' / ('organizer', organizer) / 'events'
     apiref = events_base_api / ('event', event)
     event_info = _read_yaml(file or ('_'.join(apiref.fpath) + '.yml'))
-    ref_root = event_info
+    set_ref_root(event_info)
 
     event_response = apiref.patch(_without_keys(event_info['event'], {'slug'}))
     (apiref / 'settings').patch(event_info['settings'])
@@ -510,4 +367,4 @@ def oauth_grant(base):
 auth_headers = _read_yaml('auth.yml')
 
 if __name__ == '__main__':
-    cli()
+    wrapped_cli()
