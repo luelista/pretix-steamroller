@@ -1,2 +1,6 @@
-auth.yml
-oauth.yml
+*.egg-info
+
+*.yml
+
+!defaults.yml
+!examples/*
