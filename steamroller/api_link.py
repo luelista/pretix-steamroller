@@ -10,7 +10,8 @@ def print_request_error(e: RequestException):
     print("Error: ", str(e))
     print("URL:   ", e.request.method, e.request.url)
     if hasattr(e.request, 'data'): print("Sent:  ", e.request.data)
-    print("Got:   ", e.response.status_code, '>>>'+e.response.text[:300]+'<<<')
+    if e.response:
+        print("Got:   ", e.response.status_code, '>>>'+e.response.text[:300]+'<<<')
 
 class APILink:
     link_format = "{}/api/v1/{}/"
@@ -24,6 +25,7 @@ class APILink:
         self._headers = headers
         self.path = path
         self.vars = vars
+        self.request_kwargs = {'verify': False}
 
     def __str__(self):
         return self.link_format.format(self.api_base, "/".join(self.fpath))
@@ -58,18 +60,20 @@ class APILink:
 
     def with_(self, link_format):
         l = deepcopy(self)
-        l.link_format = '{}/control/{}'
+        l.link_format = link_format
         return l
 
     def _do_get_request(self, url=None):
+        res = None
         try:
-            res = requests.get(url or self.__str__(), headers=self.headers)
+            res = requests.get(url or self.__str__(), headers=self.headers, **self.request_kwargs)
             res.raise_for_status()
             return res
         except RequestException as e:
             print("Error: ", str(e))
             print("URL:   ", 'GET', self.__str__())
-            print("Got:   ", res.status_code, res.text)
+            if res:
+                print("Got:   ", res.status_code, res.text)
             raise
 
     def get_html(self):
@@ -89,7 +93,7 @@ class APILink:
 
     def _do_form_request(self, method, body):
         try:
-            res = requests.request(method, self.__str__(), data=body, headers=self.headers)
+            res = requests.request(method, self.__str__(), data=body, headers=self.headers, **self.request_kwargs)
             res.raise_for_status()
             return res.json()
         except RequestException as e:

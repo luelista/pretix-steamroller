@@ -330,6 +330,81 @@ def update_event(base, organizer, event, file=None, discounts=False):
     print("Success: " + event_response['public_url'])
 
 
+def _get_products_from_index(presale_base):
+    index = presale_base.get_html()
+    categories = {
+        cat['aria-labelledby'][len('category-'):]: {
+            'name': cat.find('h3').get_text(strip=True, separator=" "),
+            'items': {
+                item['id'][len('item-'):]: {
+                    'name': (item.find('h4') or item.find('h5')).get_text(strip=True, separator=" "),
+                    'price': item.find(class_='price').get_text(strip=True, separator=" ").replace("\xa0", " "),
+                }
+                for item in cat.find_all('article', class_='product-row')
+            }
+        }
+        for cat in index.find_all('section', class_='item-category')
+    }
+    return categories
+
+
+def _pretty_print_products(categories):
+    print("\n".join(
+        f"{c['name']}\n---------------------\n{"\n".join(f"{i_id:5s} {i['name']:30s}  {i['price']}" for i_id, i in c['items'].items())}\n"
+        for c_id, c in categories.items()
+    ))
+
+
+@cli_event.command('products')
+@click.argument('base')
+@click.argument('organizer')
+@click.argument('event')
+def list_products(base, organizer, event):
+    presale_base = APILink(base, auth_headers).with_(link_format='{}/{}/') / ('organizer', organizer) / ('event', event)
+    categories = _get_products_from_index(presale_base)
+    _pretty_print_products(categories)
+
+
+@cli_event.command('buy-ticket')
+@click.argument('base')
+@click.argument('organizer')
+@click.argument('event')
+@click.option('--product', '-p', type=str, multiple=True)
+@click.option('--product-by-name', '-P', type=str, multiple=True)
+@click.option('--unknown-product-by-id', type=str, multiple=True)
+def buy_ticket(base, organizer, event, product=(), product_by_name=(), unknown_product_by_id=()):
+    presale_base = APILink(base, auth_headers).with_(link_format='{}/{}/') / ('organizer', organizer) / ('event', event)
+    categories = _get_products_from_index(presale_base)
+    valid_items = {i_id: i for c in categories.values() for i_id, i in c['items'].items()}
+    tickets = []
+    err = False
+    for check_for in product:
+        if check_for in valid_items:
+            tickets.append((check_for, valid_items[check_for]))
+        else:
+            print(f"Unable to find product with ID {check_for}")
+            err = True
+    for check_for in unknown_product_by_id:
+        tickets.append((check_for, {"name": f"Unknown product {check_for}", "price": ""}))
+    for check_for in product_by_name:
+        found = False
+        for i_id, item in valid_items.items():
+            if check_for.lower() in item['name'].lower():
+                tickets.append((i_id, item))
+                found = True
+        if not found:
+            print(f"Unable to find product with name {check_for}")
+            err = True
+    if err or not tickets:
+        _pretty_print_products(categories)
+        return
+
+    print("Going to buy tickets:")
+    print("\n".join(f"{i_id:5s} {i['name']:30s}  {i['price']}" for i_id, i in tickets))
+
+
+
+
 @cli.group('auth')
 def cli_auth():
     pass
